@@ -1,0 +1,38 @@
+<h1>Update Student</h1>
+<form onsubmit="return updateForm()">
+    <input type="text" name="name" placeholder="Enter Name" value="<%= students[0].name%>" required><br><br>
+    <input type="email" name="email" placeholder="Enter Email" value="<%= students[0].email%>" required><br><br>
+    <input type="number" name="mno" placeholder="Enter Mobile Number" value="<%= students[0].mno%>" required><br><br>
+    <input type="hidden" name="id" value="<%= students[0].id%>">
+    <input type="submit" value="Submit">
+</form>
+
+<div id="response"></div>
+
+<script>
+    function updateForm() {
+    var name = document.getElementsByTagName('input')[0].value;
+    var email = document.getElementsByTagName('input')[1].value;
+    var mno = document.getElementsByTagName('input')[2].value;
+    var id = document.getElementsByTagName('input')[3].value;
+
+    var req = new XMLHttpRequest();
+    req.open("POST", "/update-student", true);
+    req.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+    // Send the data to the server
+    req.send("name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email) + "&mno=" + encodeURIComponent(mno) + "&id=" + encodeURIComponent(id));
+
+    req.onreadystatechange = function() {
+        if (req.readyState == 4 && req.status == 200) {
+            document.getElementById("response").innerHTML = req.responseText;
+            setTimeout(function() {
+                window.location.href = '/students';  
+            }, 2000);
+        }
+    };
+
+    return false;
+}
+
+</script>

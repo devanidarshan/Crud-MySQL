@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students List</title>
+</head>
+
+<body>
+    <h1>Students List</h1>
+
+    <h1>Search Here</h1>
+
+    <form onsubmit="return searching()">
+        <input type="search" , name="name" , placeholder="Search Name" id="name">
+        <input type="search" , name="email" , placeholder="Search Email" id="email">
+        <input type="search" , name="mno" , placeholder="Search Mobile No." id="mno">
+        <input type="Submit" value="search">
+    </form>
+
+    <table border="1" width="100%">
+        <tr>
+            <th style="padding: 5px;">S.No</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile No.</th>
+        </tr>
+
+        <% if(students.length> 0){ %>
+
+            <% for(var i=0 ; i < students.length ; i++) {%>
+
+                <tr class="tr">
+                    <td><%- students[i].id %></td>
+                    <td><%- students[i].name %></td>
+                    <td><%- students[i].email %></td>
+                    <td><%- students[i].mno %></td>
+                </tr>
+
+                <% } %>
+
+                    <% } else {%>
+                        <tr>
+                            <td>Data Not Found</td>
+                        </tr>
+                        <% } %>
+
+    </table>
+</body>
+
+</html>
+
+<script>
+    function searching() {
+
+        document.querySelectorAll(".tr").forEach(function (ele) {
+            ele.remove();
+        });
+
+        var table = document.getElementsByTagName("table")[0];
+
+        var name = document.getElementById("name").value;
+        var email = document.getElementById("email").value;
+        var mno = document.getElementById("mno").value;
+
+        var req = new XMLHttpRequest();
+
+        var url = "/searching?name=" + encodeURIComponent(name) + "&email=" + encodeURIComponent(email) + "&mno=" + encodeURIComponent(mno);
+
+        req.open("GET", url, true);
+        req.send();
+
+        req.onreadystatechange = function () {
+            if (req.readyState == 4 && req.status == 200) {
+
+                var obj = JSON.parse(req.responseText);
+
+                if (obj.length > 0) {
+                    for (let i = 0; i < obj.length; i++) {
+                        table.innerHTML += "<tr class='tr'><td>" + (i + 1) + "</td><td>" + obj[i]['name'] + "</td><td>" + obj[i]['email'] + "</td><td>" + obj[i]['mno'] + "</td></tr>";
+                    }
+                } else {
+                    table.innerHTML += "<tr class='tr'><td colspan='4'>Data Not Found</td></tr>";
+                }
+
+            }
+        };
+
+        return false;
+    }
+
+
+
+</script>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students List</title>
+</head>
+<body>
+    <h1>Students List</h1>
+
+    <table border="1" width="100%">
+        <tr>
+            <th style="padding: 5px;">S.No</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Mobile No.</th>
+            <th>Actions</th>
+        </tr>
+
+        <% if(students.length > 0){ %>
+
+            <% for(var i = 0 ; i < students.length ; i++) {%>
+
+                <tr>
+                    <td><%- students[i].id %></td>
+                    <td><%- students[i].name %></td>
+                    <td><%- students[i].email %></td>
+                    <td><%- students[i].mno %></td>
+                    <td><a href="/delete-student?id=<%- students[i].id %>">Delete</a>
+                    <a href="/update-student?id=<%- students[i].id %>">Update</a></td>
+                </tr>
+
+            <% } %>
+
+        <% } else {%>
+           <h1>Students Data Not Found</h1>
+        <% } %>
+
+    </table>
+</body>
+</html>
