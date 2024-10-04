@@ -52,20 +52,6 @@ app.get('/students' , function(req , res){
     });
 });
 
-// app.get('/delete-student' , function(req , res){
-//     con.connect(function(error){
-//         if(error) console.log(error);
-//         var id = req.query.id;
-//         var sql = "DELETE from students where id=?";
-
-//         con.query(sql, [id] , function(error, result){
-//             if(error) console.log(error);
-//             // console.log(result);
-//             res.send("Student record Deleted...");
-//         });
-//     });
-// });
-
 app.get('/delete-student', function(req, res) {
     const id = req.query.id;
 
