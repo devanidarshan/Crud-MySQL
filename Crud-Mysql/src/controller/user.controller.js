@@ -3,7 +3,6 @@ const mysqlConnection = require('../../connection');
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const common = require('../../common');
-const passport = require('passport');
 
 // Validation Middleware
 exports.validateRegisterUser = [
@@ -23,78 +22,48 @@ exports.validateRegisterUser = [
 ];
 
 // // REGISTER USER
-// exports.registerUser = async (req, res) => {
-//   // Validate inputs
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//      return common.reply(res ,400 , true ,'Validation failed.');
-//   }
-
-//   try {
-//     // Hash the password
-//     const hashpassword = await bcrypt.hash(req.body.password, 10);
-
-//     // Prepare new user data
-//     const newUser = {
-//       name: req.body.name,
-//       email: req.body.email,
-//       password: hashpassword,
-//     };
-//     console.log(newUser);
-
-//     // Insert new user into the database
-//     const sql = 'INSERT INTO user (name, email, password) VALUES (?, ?, ?)';
-//     mysqlConnection.query(sql, [newUser.name, newUser.email, newUser.password], (error, results) => {
-//       if (error) {
-//         console.error(error);
-//         return common.reply(res , 500 , true ,`Error registering user...`);
-//       }
-
-//       // Response
-//       const data = {
-//         user:{
-//           id: results.insertId,
-//             name: newUser.name,
-//             email: newUser.email
-//         }
-//       };
-//       return common.reply(res , 201 , false ,`New User Added Successfully...` , data);
-
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return common.reply(res , 500 , true ,`Internal Server Error...`);
-//   }
-// };
-
-// REGISTER USER
-exports.registerUser = async (req, res, next) => {
+exports.registerUser = async (req, res) => {
   // Validate inputs
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return common.reply(res, 400, true, 'Validation failed.');
+     return common.reply(res ,400 , true ,'Validation failed.');
   }
 
-  passport.authenticate('local-register', (err, user, info) => {
-    if (err) {
-      console.error(err);
-      return common.reply(res, 500, true, 'Internal Server Error...');
-    }
+  try {
+    // Hash the password
+    const hashpassword = await bcrypt.hash(req.body.password, 10);
 
-    if (!user) {
-      return common.reply(res, 400, true, info.message); // 'Email already exists.'
-    }
-
-    // If user is registered successfully, send response
-    const data = {
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-      },
+    // Prepare new user data
+    const newUser = {
+      name: req.body.name,
+      email: req.body.email,
+      password: hashpassword,
     };
-    return common.reply(res, 201, false, 'New User Added Successfully...', data);
-  })(req, res, next);
+    console.log(newUser);
+
+    // Insert new user into the database
+    const sql = 'INSERT INTO user (name, email, password) VALUES (?, ?, ?)';
+    mysqlConnection.query(sql, [newUser.name, newUser.email, newUser.password], (error, results) => {
+      if (error) {
+        console.error(error);
+        return common.reply(res , 500 , true ,`Error registering user...`);
+      }
+
+      // Response
+      const data = {
+        user:{
+          id: results.insertId,
+            name: newUser.name,
+            email: newUser.email
+        }
+      };
+      return common.reply(res , 201 , false ,`New User Added Successfully...` , data);
+
+    });
+  } catch (error) {
+    console.log(error);
+    return common.reply(res , 500 , true ,`Internal Server Error...`);
+  }
 };
 
 // Validation Middleware
@@ -107,81 +76,47 @@ exports.validateLoginUser = [
 ];
 
 // // LOGIN USER
-// exports.loginUser = async (req, res) => {
-//   // Validate inputs
-//   const errors = validationResult(req);
-//   if (!errors.isEmpty()) {
-//     return common.reply(res ,400 , true ,'Validation failed.');
-//   }
-
-//   try {
-//     // Check if user exists
-//     const User = 'SELECT * FROM user WHERE email = ?';
-//     mysqlConnection.query(User, [req.body.email], async (error, results) => {
-//       if (error) {
-//         console.error(error);
-//         return common.reply(res , 500 , true ,`Internal Server Error...`);
-//       }
-
-//       if (results.length === 0) {
-//         return common.reply(res , 404 , true ,`Email Not Found...`);
-//       }
-
-//       const user = results[0];
-
-//       // Check password
-//       const checkPassword = await bcrypt.compare(req.body.password, user.password);
-//       if (!checkPassword) {
-//         return common.reply(res , 401 , true ,`Password Not Match...`);
-//       }
-
-//       // Generate JWT token
-//       const token = jwt.sign({ userId: user.id }, "User");
-//       console.log(token);
-//       const data = {
-//         user:{ id:user.id , name:user.name , email:user.email}
-//       }
-//       return common.reply(res , 200 , false , `User Login Successfully..` , data);
-//     });
-//   } catch (error) {
-//     console.log(error);
-//     return common.reply(res , 500 , true ,`Internal Server Error...`);
-//   }
-// };
-
-// LOGIN USER
-exports.loginUser = (req, res, next) => {
+exports.loginUser = async (req, res) => {
   // Validate inputs
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return common.reply(res, 400, true, 'Validation failed.');
+    return common.reply(res ,400 , true ,'Validation failed.');
   }
 
-  passport.authenticate('local-login', (err, user, info) => {
-    if (err) {
-      console.error(err);
-      return common.reply(res, 500, true, 'Internal Server Error...');
-    }
+  try {
+    // Check if user exists
+    const User = 'SELECT * FROM user WHERE email = ?';
+    mysqlConnection.query(User, [req.body.email], async (error, results) => {
+      if (error) {
+        console.error(error);
+        return common.reply(res , 500 , true ,`Internal Server Error...`);
+      }
 
-    if (!user) {
-      return common.reply(res, 401, true, info.message); // 'Email Not Found.' or 'Password Not Match.'
-    }
+      if (results.length === 0) {
+        return common.reply(res , 404 , true ,`Email Not Found...`);
+      }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user.id }, process.env.KEY);
-    console.log(token);
+      const user = results[0];
 
-    const data = {
-      user: { id: user.id, name: user.name, email: user.email },
-    };
-    // console.log(data);
-    
+      // Check password
+      const checkPassword = await bcrypt.compare(req.body.password, user.password);
+      if (!checkPassword) {
+        return common.reply(res , 401 , true ,`Password Not Match...`);
+      }
 
-    // Response with token
-    return common.reply(res, 200, false, 'User Login Successfully.', { token, ...data });
-  })(req, res, next);
+      // Generate JWT token
+      const token = jwt.sign({ userId: user.id }, "User");
+      console.log(token);
+      const data = {
+        user:{ id:user.id , name:user.name , email:user.email}
+      }
+      return common.reply(res , 200 , false , `User Login Successfully..` , data);
+    });
+  } catch (error) {
+    console.log(error);
+    return common.reply(res , 500 , true ,`Internal Server Error...`);
+  }
 };
-
 
 // // GET ALL USER
 // exports.getAllUser = async (req, res) => {
